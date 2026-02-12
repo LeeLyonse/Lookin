@@ -11,6 +11,7 @@
 #import "LKConnectionManager.h"
 #import "LKPreferenceManager.h"
 #import "LKAppMenuManager.h"
+#import "LKHTTPServer.h"
 #import "LKLaunchWindowController.h"
 #import "LookinDocument.h"
 #import "NSString+Score.h"
@@ -47,8 +48,9 @@
     }];
 }
 
-- (void)applicationDidFinishLaunching:(NSNotification *)aNotification {    
+- (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     [LKConnectionManager sharedInstance];
+    [[LKHTTPServer sharedInstance] start];
     if (!self.launchedToOpenFile) {
         [[LKNavigationManager sharedInstance] showLaunch];
     }
@@ -84,7 +86,8 @@
 }
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender {
-    // 清理打开 UIImageView 的图片时创建的临时文件
+    [[LKHTTPServer sharedInstance] stop];
+    // Clean up temp image files created when opening UIImageView images
     NSArray<NSString *> *tempImageFilesToDelete = [LKHelper sharedInstance].tempImageFiles;
     if (tempImageFilesToDelete.count == 0) {
         return NSTerminateNow;

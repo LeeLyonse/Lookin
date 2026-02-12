@@ -6,3 +6,10 @@ Lookin.xcworkspace/xcuserdata
 DerivedData/
 Gemfile
 Gemfile.lock
+
+# MCP Server
+LookinMCP/node_modules
+LookinMCP/dist
+
+# Claude Code
+.claude

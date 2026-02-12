@@ -1,0 +1,43 @@
+{
+  "name": "lookin-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for Lookin — inspect iOS app UI hierarchy from AI agents",
+  "main": "dist/index.js",
+  "bin": {
+    "lookin-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "lookin",
+    "ios",
+    "ui-inspector",
+    "model-context-protocol",
+    "claude",
+    "ai-agent",
+    "debugging"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xinnyu/Lookin.git",
+    "directory": "LookinMCP"
+  },
+  "homepage": "https://lookin.work",
+  "license": "GPL-3.0",
+  "author": "xinnyu",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "@types/node": "^22.15.0"
+  }
+}
