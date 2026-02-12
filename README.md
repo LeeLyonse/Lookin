@@ -33,6 +33,24 @@ macOS app: https://github.com/hughkli/Lookin/
 # Acknowledgements
 https://qxh1ndiez2w.feishu.cn/docx/YIFjdE4gIolp3hxn1tGckiBxnWf
 
+# MCP Server (AI Agent Integration)
+
+Lookin includes an MCP (Model Context Protocol) server that allows AI agents (like Claude) to inspect iOS app UI hierarchies.
+
+### Setup
+```json
+{
+  "mcpServers": {
+    "lookin": {
+      "command": "npx",
+      "args": ["-y", "lookin-mcp"]
+    }
+  }
+}
+```
+
+See [LookinMCP/README.md](LookinMCP/README.md) for details.
+
 ---
 # 简介
 Lookin 可以查看与修改 iOS App 里的 UI 对象，类似于 Xcode 自带的 UI Inspector 工具，或另一款叫做 Reveal 的软件。
@@ -69,3 +87,21 @@ macOS 端软件：https://github.com/hughkli/Lookin/
 
 # 鸣谢
 https://qxh1ndiez2w.feishu.cn/docx/YIFjdE4gIolp3hxn1tGckiBxnWf
+
+# MCP 服务（AI Agent 集成）
+
+Lookin 内置了 MCP (Model Context Protocol) 服务，允许 AI Agent（如 Claude）实时查询 iOS 应用的 UI 视图层级。
+
+### 配置
+```json
+{
+  "mcpServers": {
+    "lookin": {
+      "command": "npx",
+      "args": ["-y", "lookin-mcp"]
+    }
+  }
+}
+```
+
+详见 [LookinMCP/README.md](LookinMCP/README.md)。
