@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'LookinExtras'
-  s.version      = '0.1.0'
+  s.version      = '0.1.1'
   s.summary      = 'Drop-in extra view attributes that LookinServer SDK does not capture by default.'
   s.description  = <<-DESC
     LookinExtras adds Objective-C categories on UIView/CALayer that implement
