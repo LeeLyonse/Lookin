@@ -6,11 +6,14 @@ LookinExtras adds Objective-C categories that implement the official
 `lookin_customDebugInfos` extension point exposed by LookinServer SDK,
 surfacing attributes the SDK does not capture by default.
 
-## What's included (v0.1.2)
+## What's included (v0.1.3)
 
 | Attribute | Type | Source |
 |-----------|------|--------|
 | `layer.maskedCorners` | string | `CALayer.maskedCorners` decoded into `TopLeft,TopRight,...` |
+| `attributedText` | json | `UILabel`, `UITextView`, and `UITextField` attributed text as readable text plus `NSAttributedString.description` |
+| `attributedPlaceholder` | json | `UITextField.attributedPlaceholder` as readable text plus `NSAttributedString.description` |
+| `attributedTitle.*` | json | `UIButton` normal/highlighted/selected/disabled attributed titles as readable text plus `NSAttributedString.description` |
 | `lkdump__...` | string | Runtime property-chain dumper for the Lookin console |
 
 ## Usage
@@ -21,7 +24,7 @@ Add to your app's `Podfile` (Debug only — release builds must NOT bundle this)
 pod 'LookinServer', :configurations => ['Debug']
 pod 'LookinExtras',
     :git           => 'https://github.com/LeeLyonse/Lookin.git',
-    :tag           => 'extras-v0.1.2',
+    :tag           => 'extras-v0.1.3',
     :configurations => ['Debug']
 ```
 
