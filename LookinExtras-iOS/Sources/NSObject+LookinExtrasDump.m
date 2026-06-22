@@ -2,7 +2,15 @@
 #import <objc/runtime.h>
 #import <string.h>
 
-#import "LookinExtras-Swift.h"
+// Forward-declare the Swift bridge instead of importing the generated
+// "LookinExtras-Swift.h". In a mixed-language static-library pod that header is
+// produced only after Swift compiles, so it is missing at dependency-scan time
+// and breaks the build under Xcode's explicit-modules system. The class is
+// registered with the Objective-C runtime under this exact name via
+// @objc(LookinExtrasDumper), so a forward declaration is all this file needs.
+@interface LookinExtrasDumper : NSObject
++ (NSString *)lookinDumpForObject:(NSObject *)object selectorName:(NSString *)selectorName;
+@end
 
 static const char *const LKXLookinDumpPrefix = "lkdump__";
 static const size_t LKXLookinDumpPrefixLength = 8;
