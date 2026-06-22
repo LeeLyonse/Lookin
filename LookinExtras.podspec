@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'LookinExtras'
-  s.version      = '0.1.1'
+  s.version      = '0.1.2'
   s.summary      = 'Drop-in extra view attributes that LookinServer SDK does not capture by default.'
   s.description  = <<-DESC
     LookinExtras adds Objective-C categories on UIView/CALayer that implement
@@ -8,7 +8,8 @@ Pod::Spec.new do |s|
 
     It surfaces attributes that LookinServer 1.2.x does not capture out of the box,
     such as `layer.maskedCorners`, `view.directionalLayoutMargins`,
-    `view.semanticContentAttribute`, etc.
+    `view.semanticContentAttribute`, etc. It also adds the `lkdump__` debug selector
+    bridge for printing property chains from the Lookin console.
 
     Drop the pod into any iOS app that already integrates `LookinServer` (Debug-only)
     and the extra attributes will appear in the Lookin macOS client automatically.
@@ -20,7 +21,8 @@ Pod::Spec.new do |s|
   s.source       = { :git => 'https://github.com/LeeLyonse/Lookin.git',
                      :tag => "extras-v#{s.version}" }
   s.platform     = :ios, '13.0'
-  s.source_files = 'LookinExtras-iOS/Sources/**/*.{h,m}'
+  s.source_files = 'LookinExtras-iOS/Sources/**/*.{h,m,swift}'
   s.requires_arc = true
+  s.swift_version = '5.0'
   s.dependency   'LookinServer'
 end
