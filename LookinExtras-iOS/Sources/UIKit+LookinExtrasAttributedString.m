@@ -1,36 +1,13 @@
 #import <UIKit/UIKit.h>
 
-static NSString *LKXJSONStringFromObject(id object) {
-    if (![NSJSONSerialization isValidJSONObject:object]) {
-        return @"[]";
-    }
-
-    NSError *error = nil;
-    NSData *data = [NSJSONSerialization dataWithJSONObject:object
-                                                   options:NSJSONWritingPrettyPrinted
-                                                     error:&error];
-    if (!data || error) {
-        return @"[]";
-    }
-
-    return [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] ?: @"[]";
-}
-
 static NSString *LKXAttributedStringPayload(NSAttributedString *value) {
     if (!value || value.length == 0) {
         return nil;
     }
 
-    return LKXJSONStringFromObject(@[
-        @{
-            @"title": @"string",
-            @"desc": value.string ?: @"",
-        },
-        @{
-            @"title": @"description",
-            @"desc": value.description ?: @"",
-        },
-    ]);
+    return [NSString stringWithFormat:@"string: %@\ndescription: %@",
+                                      value.string ?: @"",
+                                      value.description ?: @""];
 }
 
 static void LKXAddAttributedStringProperty(NSMutableArray<NSDictionary *> *properties,
@@ -44,7 +21,7 @@ static void LKXAddAttributedStringProperty(NSMutableArray<NSDictionary *> *prope
 
     [properties addObject:@{
         @"title": title,
-        @"valueType": @"json",
+        @"valueType": @"string",
         @"section": section,
         @"value": payload,
     }];

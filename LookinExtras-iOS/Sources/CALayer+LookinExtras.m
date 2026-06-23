@@ -1,4 +1,4 @@
-#import "CALayer+LookinExtras.h"
+#import <QuartzCore/QuartzCore.h>
 
 @implementation CALayer (LookinExtras)
 

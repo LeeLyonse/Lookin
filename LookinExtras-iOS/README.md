@@ -11,9 +11,9 @@ surfacing attributes the SDK does not capture by default.
 | Attribute | Type | Source |
 |-----------|------|--------|
 | `layer.maskedCorners` | string | `CALayer.maskedCorners` decoded into `TopLeft,TopRight,...` |
-| `attributedText` | json | `UILabel`, `UITextView`, and `UITextField` attributed text as readable text plus `NSAttributedString.description` |
-| `attributedPlaceholder` | json | `UITextField.attributedPlaceholder` as readable text plus `NSAttributedString.description` |
-| `attributedTitle.*` | json | `UIButton` normal/highlighted/selected/disabled attributed titles as readable text plus `NSAttributedString.description` |
+| `attributedText` | string | `UILabel`, `UITextView`, and `UITextField` attributed text as readable text plus `NSAttributedString.description` |
+| `attributedPlaceholder` | string | `UITextField.attributedPlaceholder` as readable text plus `NSAttributedString.description` |
+| `attributedTitle.*` | string | `UIButton` normal/highlighted/selected/disabled attributed titles as readable text plus `NSAttributedString.description` |
 | `lkdump__...` | string | Runtime property-chain dumper for the Lookin console |
 
 ## Usage

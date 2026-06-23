@@ -394,32 +394,6 @@
     }
 }
 
-+ (id)_jsonObjectFromAttributeValue:(id)value {
-    if ([value isKindOfClass:NSDictionary.class] ||
-        [value isKindOfClass:NSArray.class]) {
-        return value;
-    }
-
-    if (![value isKindOfClass:NSString.class]) {
-        return @{};
-    }
-
-    NSData *data = [(NSString *)value dataUsingEncoding:NSUTF8StringEncoding];
-    if (!data) {
-        return @{};
-    }
-
-    NSError *error = nil;
-    id object = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
-    if (error ||
-        !([object isKindOfClass:NSDictionary.class] ||
-          [object isKindOfClass:NSArray.class])) {
-        return @{};
-    }
-
-    return object;
-}
-
 /// Serializes a single LookinAttribute into a JSON-friendly dictionary.
 /// Returns nil to indicate the attribute should be skipped entirely (None / Void / empty attr).
 + (NSDictionary *)_flattenAttribute:(LookinAttribute *)attr {
@@ -483,7 +457,12 @@
             break;
 
         case LookinAttrTypeJson:
-            d[@"value"] = [self _jsonObjectFromAttributeValue:value];
+            if ([value isKindOfClass:NSDictionary.class] ||
+                [value isKindOfClass:NSArray.class]) {
+                d[@"value"] = value;
+            } else {
+                d[@"value"] = @{};
+            }
             break;
 
         case LookinAttrTypeCGPoint:

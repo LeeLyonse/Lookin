@@ -77,14 +77,7 @@ public final class LookinExtrasDumper: NSObject {
 
     private static func dumpString(_ value: Any) -> String {
         guard let unwrapped = unwrap(value) else { return "<nil>" }
-        switch unwrapped {
-        case let urls as [URL]:
-            return urls.map(\.absoluteString).joined(separator: "\n")
-        case let url as URL:
-            return url.absoluteString
-        default:
-            return String(describing: unwrapped)
-        }
+        return String(describing: unwrapped)
     }
 
     private static func objectGetterValue(named key: String, in value: Any) -> Any? {
