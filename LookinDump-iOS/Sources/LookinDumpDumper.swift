@@ -2,8 +2,8 @@ import Foundation
 import ObjectiveC.runtime
 import UIKit
 
-@objc(LookinExtrasDumper)
-public final class LookinExtrasDumper: NSObject {
+@objc(LookinDumpDumper)
+public final class LookinDumpDumper: NSObject {
     private typealias ObjectGetter = @convention(c) (NSObject, Selector) -> Unmanaged<AnyObject>?
     private typealias ClassGetter = @convention(c) (NSObject, Selector) -> AnyClass?
     private typealias BoolGetter = @convention(c) (NSObject, Selector) -> Bool

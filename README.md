@@ -36,20 +36,29 @@ Never integrate LookinServer in Release building configuration.
 `pod 'LookinServer', :configurations => ['Debug']`
 
 ### Recommended Debug Extras
-For richer debugging, add `LookinExtras` to the same Debug app target:
+For richer automatic UI attributes, add `LookinExtras` to the same Debug app target:
 
 ```ruby
 pod 'LookinExtras',
     :git => 'https://github.com/LeeLyonse/Lookin.git',
-    :tag => 'extras-v0.1.3',
+    :tag => 'extras-v0.2.0',
     :configurations => ['Debug']
 ```
 
 `LookinExtras` runs inside the debug iOS app and provides:
 
 - Extra automatic attributes through LookinServer's `lookin_customDebugInfos` extension point, such as `layer.maskedCorners` and common UIKit attributed string values.
-- A Lookin console property-chain dumper. Select a view and print values with selectors like `lkdump__nextResponder__viewModel__currentOptionsForMap` or `lkdump__frame`.
-- Swift stored-property reflection and Objective-C no-argument getter reading, including common scalar return types. Each `lkdump__` path component is invoked as a zero-argument method, so avoid naming value-returning methods with side effects (e.g. `becomeFirstResponder`); Swift computed properties not exposed to Objective-C resolve to `<nil>`.
+
+If you only need console property-chain dumping, or want to use it without UI extras, add `LookinDump`:
+
+```ruby
+pod 'LookinDump',
+    :git => 'https://github.com/LeeLyonse/Lookin.git',
+    :tag => 'dump-v0.1.0',
+    :configurations => ['Debug']
+```
+
+`LookinDump` adds selectors such as `lkdump__nextResponder__viewModel__currentOptionsForMap` and `lkdump__frame`. It supports Swift stored-property reflection and Objective-C no-argument getter reading, including common scalar return types. Each `lkdump__` path component is invoked as a zero-argument method, so avoid naming value-returning methods with side effects (e.g. `becomeFirstResponder`); Swift computed properties not exposed to Objective-C resolve to `<nil>`.
 
 This fork also expands `attributeGroups` in the macOS client's JSON detail output, so MCP agents can read the extra attributes exposed by `LookinExtras`.
 
@@ -108,20 +117,29 @@ Lookin 可以查看与修改 iOS App 里的 UI 对象，类似于 Xcode 自带�
 `pod 'LookinServer', :configurations => ['Debug']`
 
 ### 推荐的 Debug 增强
-为了获得更多调试信息，建议在同一个 Debug App target 里加入 `LookinExtras`：
+为了获得更多自动 UI 属性，建议在同一个 Debug App target 里加入 `LookinExtras`：
 
 ```ruby
 pod 'LookinExtras',
     :git => 'https://github.com/LeeLyonse/Lookin.git',
-    :tag => 'extras-v0.1.3',
+    :tag => 'extras-v0.2.0',
     :configurations => ['Debug']
 ```
 
 `LookinExtras` 会运行在被调试的 iOS App 进程里，提供这些增强能力：
 
 - 通过 LookinServer 的 `lookin_customDebugInfos` 扩展点补充自动采集属性，例如 `layer.maskedCorners` 和常见 UIKit 富文本属性。
-- 增加 Lookin Console 属性链打印能力。选中 view 后可以输入 `lkdump__nextResponder__viewModel__currentOptionsForMap` 或 `lkdump__frame`。
-- 支持读取 Swift stored property，以及 Objective-C 无参 getter，包括常见标量返回值。`lkdump__` 路径每一段都会作为无参方法被调用，因此不要使用有副作用的取值方法（例如 `becomeFirstResponder`）；未暴露给 Objective-C 的 Swift computed property 会解析为 `<nil>`。
+
+如果项目只需要 Console 属性链打印，或者不想引入 UI extras，可以单独加入 `LookinDump`：
+
+```ruby
+pod 'LookinDump',
+    :git => 'https://github.com/LeeLyonse/Lookin.git',
+    :tag => 'dump-v0.1.0',
+    :configurations => ['Debug']
+```
+
+`LookinDump` 提供 `lkdump__nextResponder__viewModel__currentOptionsForMap`、`lkdump__frame` 这类命令。它支持读取 Swift stored property，以及 Objective-C 无参 getter，包括常见标量返回值。`lkdump__` 路径每一段都会作为无参方法被调用，因此不要使用有副作用的取值方法（例如 `becomeFirstResponder`）；未暴露给 Objective-C 的 Swift computed property 会解析为 `<nil>`。
 
 这个 fork 的 macOS Client 也展开了 `attributeGroups` 的 JSON detail 输出，所以 MCP Agent 可以读取 `LookinExtras` 暴露出来的额外属性。
 
