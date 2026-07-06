@@ -47,6 +47,7 @@ Add to your MCP config (e.g. `~/.claude/mcp.json`):
 | `lookin_get_selected_view` | Get details of the currently selected view |
 | `lookin_get_view_detail` | Get detailed attributes of a view by oid |
 | `lookin_search_views` | Search views by class name, text, or address |
+| `lookin_invoke_method` | Invoke a no-argument selector/property on a view object, same as Lookin Console |
 
 ## Text Tree Format
 
@@ -62,6 +63,27 @@ UIWindow 0x7f8 oid=123 {0,0,390,844}
 Each line: `{indent}{className} {address} oid={id} ({subtitle}) {x,y,w,h} [flags]`
 
 Use `format: "json"` when you need structured data for programmatic processing.
+
+## UI Interaction Commands
+
+`lookin_invoke_method` calls the same no-argument selector path as Lookin
+Console. It can drive app-side debug helpers such as LookinTouch:
+
+```text
+lktouch__tapVisibleCenter
+lktouch__swipeUp
+lktouch__swipeDown
+lktouch__swipeLeft
+lktouch__swipeRight
+lktype_hex__E4BDA0E5A5BD
+lktype__pasteboard
+lkdelete__3
+lkreturn
+```
+
+Pass an `oid` from the UI tree/search result, or omit `oid` to invoke on the
+currently selected view in Lookin. The iOS app must integrate the corresponding
+debug helper, such as `LookinTouch`, for these commands to exist.
 
 ## Development
 

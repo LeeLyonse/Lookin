@@ -59,3 +59,14 @@ export async function searchViews(keyword: string): Promise<LookinResponse> {
 export async function reloadHierarchy(): Promise<LookinResponse> {
   return fetchJSON("/api/reload", "POST");
 }
+
+export async function invokeMethod(
+  method: string,
+  oid?: string
+): Promise<LookinResponse> {
+  const params = new URLSearchParams({ method });
+  if (oid) {
+    params.set("oid", oid);
+  }
+  return fetchJSON(`/api/invoke?${params.toString()}`, "POST");
+}

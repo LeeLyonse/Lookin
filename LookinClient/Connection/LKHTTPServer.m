@@ -116,6 +116,14 @@ static const NSUInteger kDefaultPort = 56780;
     [self.webServer addHandlerForMethod:@"POST" path:@"/api/reload" requestClass:[GCDWebServerRequest class] asyncProcessBlock:^(__kindof GCDWebServerRequest * _Nonnull request, GCDWebServerCompletionBlock completionBlock) {
         [weakSelf _handleReloadWithCompletion:completionBlock];
     }];
+
+    // POST /api/invoke (with ?oid=xxx&method=selector)
+    // If oid is omitted, invokes on the currently selected view object.
+    [self.webServer addHandlerForMethod:@"POST" path:@"/api/invoke" requestClass:[GCDWebServerRequest class] asyncProcessBlock:^(__kindof GCDWebServerRequest * _Nonnull request, GCDWebServerCompletionBlock completionBlock) {
+        NSString *oidStr = request.query[@"oid"];
+        NSString *method = request.query[@"method"] ?: request.query[@"selector"] ?: request.query[@"text"];
+        [weakSelf _handleInvokeWithOid:oidStr method:method completion:completionBlock];
+    }];
 }
 
 #pragma mark - Handlers
@@ -231,11 +239,116 @@ static const NSUInteger kDefaultPort = 56780;
     });
 }
 
+- (void)_handleInvokeWithOid:(NSString *)oidStr method:(NSString *)method completion:(GCDWebServerCompletionBlock)completionBlock {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (!method.length) {
+            completionBlock([self _errorResponse:@"Missing 'method' parameter." code:400]);
+            return;
+        }
+        if ([method containsString:@":"] || [method containsString:@"."]) {
+            completionBlock([self _errorResponse:@"Lookin only supports invoking no-argument selector/property names." code:400]);
+            return;
+        }
+
+        LKInspectableApp *app = [LKAppsManager sharedInstance].inspectingApp;
+        if (!app) {
+            completionBlock([self _errorResponse:@"No app connected. Please connect an iOS app in Lookin first." code:404]);
+            return;
+        }
+
+        unsigned long oid = oidStr.length ? (unsigned long)oidStr.longLongValue : 0;
+        if (!oid) {
+            LookinDisplayItem *selected = [LKStaticHierarchyDataSource sharedInstance].selectedItem;
+            LookinObject *object = selected.viewObject ?: selected.layerObject;
+            oid = object.oid;
+        }
+        if (!oid) {
+            completionBlock([self _errorResponse:@"Missing 'oid' parameter and no view is selected in Lookin." code:400]);
+            return;
+        }
+
+        [[app invokeMethodWithOid:oid text:method] subscribeNext:^(id value) {
+            NSMutableDictionary *result = [NSMutableDictionary dictionary];
+            result[@"success"] = @(YES);
+            result[@"oid"] = @(oid);
+            result[@"method"] = method;
+            if (value) {
+                result[@"result"] = [self _jsonSafeObject:value];
+            }
+            if ([value isKindOfClass:[NSDictionary class]]) {
+                id descriptionValue = [(NSDictionary *)value objectForKey:@"description"];
+                NSString *description = [descriptionValue isKindOfClass:[NSString class]] ? descriptionValue : [descriptionValue description];
+                if (description.length) {
+                    result[@"description"] = description;
+                }
+            }
+            completionBlock([self _jsonResponse:result]);
+        } error:^(NSError * _Nullable error) {
+            NSString *message = error.localizedDescription ?: @"Invoke method failed.";
+            completionBlock([self _errorResponse:message code:500]);
+        }];
+    });
+}
+
 #pragma mark - Response Helpers
 
 - (GCDWebServerDataResponse *)_jsonResponse:(id)object {
-    NSData *data = [NSJSONSerialization dataWithJSONObject:object options:NSJSONWritingPrettyPrinted error:nil];
+    id jsonObject = [self _jsonSafeObject:object] ?: @{};
+    NSError *error = nil;
+    NSData *data = [NSJSONSerialization dataWithJSONObject:jsonObject options:NSJSONWritingPrettyPrinted error:&error];
+    if (!data) {
+        NSDictionary *body = @{@"error": error.localizedDescription ?: @"Failed to serialize JSON response."};
+        data = [NSJSONSerialization dataWithJSONObject:body options:0 error:nil];
+    }
     return [GCDWebServerDataResponse responseWithData:data contentType:@"application/json"];
+}
+
+- (id)_jsonSafeObject:(id)object {
+    if (!object) {
+        return nil;
+    }
+    if ([object isKindOfClass:[NSNull class]] ||
+        [object isKindOfClass:[NSString class]] ||
+        [object isKindOfClass:[NSNumber class]]) {
+        return object;
+    }
+    if ([object isKindOfClass:[NSArray class]]) {
+        NSMutableArray *array = [NSMutableArray array];
+        for (id value in (NSArray *)object) {
+            [array addObject:[self _jsonSafeObject:value] ?: [NSNull null]];
+        }
+        return [array copy];
+    }
+    if ([object isKindOfClass:[NSDictionary class]]) {
+        NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
+        [(NSDictionary *)object enumerateKeysAndObjectsUsingBlock:^(id key, id value, BOOL *stop) {
+            NSString *safeKey = [key isKindOfClass:[NSString class]] ? key : [key description];
+            if (!safeKey.length) {
+                return;
+            }
+            dictionary[safeKey] = [self _jsonSafeObject:value] ?: [NSNull null];
+        }];
+        return [dictionary copy];
+    }
+    if ([object isKindOfClass:[LookinObject class]]) {
+        LookinObject *lookinObject = (LookinObject *)object;
+        NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
+        if (lookinObject.oid) {
+            dictionary[@"oid"] = @(lookinObject.oid);
+        }
+        if (lookinObject.rawClassName.length) {
+            dictionary[@"className"] = lookinObject.rawClassName;
+        }
+        if (lookinObject.memoryAddress.length) {
+            dictionary[@"address"] = lookinObject.memoryAddress;
+        }
+        NSString *description = [lookinObject description];
+        if (description.length) {
+            dictionary[@"description"] = description;
+        }
+        return [dictionary copy];
+    }
+    return [object description] ?: @"";
 }
 
 - (GCDWebServerDataResponse *)_errorResponse:(NSString *)message code:(NSInteger)code {

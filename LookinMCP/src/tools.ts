@@ -8,6 +8,7 @@ import {
   getViewDetail,
   searchViews,
   reloadHierarchy,
+  invokeMethod,
 } from "./lookin-client.js";
 
 export function registerTools(server: McpServer): void {
@@ -119,6 +120,31 @@ export function registerTools(server: McpServer): void {
     {},
     async () => {
       const result = await reloadHierarchy();
+      return {
+        content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        isError: !!result.error,
+      };
+    }
+  );
+
+  server.tool(
+    "lookin_invoke_method",
+    "Invoke a no-argument selector/property on a view object through Lookin, equivalent to typing the method name in Lookin Console. Use this for debug-only commands exposed by the app, such as LookinTouch: lktouch__tapVisibleCenter, lktouch__swipeUp, lktype_hex__E4BDA0E5A5BD, lkdelete__3, lkreturn. The target app must integrate the corresponding debug helpers.",
+    {
+      method: z
+        .string()
+        .describe(
+          "No-argument selector/property name to invoke. Do not include ':' or '.'. Examples: lktouch__tapVisibleCenter, lktouch__swipeUp, lktype_hex__E4BDA0E5A5BD, lkreturn."
+        ),
+      oid: z
+        .string()
+        .optional()
+        .describe(
+          "Optional oid of the target view/object from lookin_get_ui_tree or lookin_search_views. If omitted, Lookin invokes the currently selected view."
+        ),
+    },
+    async ({ method, oid }) => {
+      const result = await invokeMethod(method, oid);
       return {
         content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
         isError: !!result.error,
